@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f8f1ee" />
+<meta name="description" content="30 道关于 TA 的情境题：按你对 TA 的了解作答，测出你眼里的 TA 有多笃定。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23d3485e'/%3E%3Cpath d='M32 47c-9-6.4-14-11-14-16.4 0-4.9 3.6-8.6 8.2-8.6 2.4 0 4.6 1.1 5.8 3 1.2-1.9 3.4-3 5.8-3 4.6 0 8.2 3.7 8.2 8.6 0 5.4-5 10-14 16.4z' fill='%23fff6f4'/%3E%3C/svg%3E" />
+<title>TA 的忠诚度测试 · 30 题</title>
+<style>
+  :root{
+    --bg:#f7efe9;
+    --bg-2:#fdf7f3;
+    --card:#fffdfa;
+    --ink:#25151a;
+    --ink-soft:#6f585e;
+    --ink-faint:#9c858b;
+    --line:rgba(37,21,26,.10);
+    --accent:#cf4860;
+    --accent-deep:#a8344a;
+    --accent-tint:#f8e3e5;
+    --radius:18px;
+    --serif:"Songti SC","Noto Serif CJK SC","Source Han Serif SC","STSong","KaiTi",Georgia,serif;
+    --num:Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+    --pad-y:clamp(18px,4vw,56px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.6;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:var(--pad-y) clamp(14px,4vw,32px) calc(var(--pad-y) + 16px);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- background ---------- */
+  .bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .bg i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
+  .bg i:nth-child(1){width:52vmax;height:52vmax;left:-18vmax;top:-22vmax;background:radial-gradient(circle at 40% 40%,rgba(207,72,96,.30),rgba(207,72,96,0) 68%);animation:drift1 22s ease-in-out infinite alternate}
+  .bg i:nth-child(2){width:44vmax;height:44vmax;right:-16vmax;top:8vh;background:radial-gradient(circle at 50% 50%,rgba(232,160,120,.30),rgba(232,160,120,0) 68%);animation:drift2 26s ease-in-out infinite alternate}
+  .bg i:nth-child(3){width:38vmax;height:38vmax;left:18vw;bottom:-24vmax;background:radial-gradient(circle at 50% 50%,rgba(180,120,140,.24),rgba(180,120,140,0) 70%);animation:drift1 30s ease-in-out infinite alternate}
+  @keyframes drift1{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(4vw,3vh,0) scale(1.08)}}
+  @keyframes drift2{from{transform:translate3d(0,0,0) scale(1.04)}to{transform:translate3d(-4vw,4vh,0) scale(1)}}
+  .bg::after{
+    content:"";position:absolute;inset:0;
+    background-image:radial-gradient(rgba(37,21,26,.05) 1px,transparent 1px);
+    background-size:3px 3px;opacity:.35;
+  }
+
+  /* ---------- shell ---------- */
+  .shell{width:100%;max-width:760px}
+
+  .screen{display:none}
+  .screen.is-active{display:block;animation:rise .6s cubic-bezier(.22,.8,.2,1) both}
+  #intro.is-active,#quiz.is-active{
+    display:flex;flex-direction:column;justify-content:center;
+    min-height:calc(100vh - var(--pad-y)*2 - 20px);
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  /* ---------- code modal ---------- */
+  .modal{
+    position:fixed;inset:0;z-index:30;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+  }
+  .modal.on{opacity:1;pointer-events:auto}
+  .modal-mask{position:absolute;inset:0;background:rgba(37,21,26,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .modal-card{
+    position:relative;width:min(400px,100%);
+    background:#fffdfa;border-radius:20px;
+    padding:28px 26px 24px;
+    box-shadow:0 40px 80px -30px rgba(60,20,30,.55);
+    transform:translateY(14px) scale(.98);opacity:0;
+    transition:transform .3s cubic-bezier(.22,.8,.2,1),opacity .3s ease;
+  }
+  .modal.on .modal-card{transform:none;opacity:1}
+  .modal-eyebrow{font-size:10.5px;letter-spacing:.24em;color:var(--accent-deep);font-weight:600;margin-bottom:10px}
+  .modal-title{font-family:var(--serif);font-size:clamp(24px,6vw,28px);font-weight:700;letter-spacing:.02em;margin:0 0 8px}
+  .modal-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.7;margin:0 0 18px}
+  .code-input{
+    width:100%;
+    font-family:var(--num);font-size:19px;letter-spacing:.22em;text-align:center;
+    padding:13px 14px;border-radius:12px;
+    border:1px solid var(--line);background:#fbf6f4;color:var(--ink);
+    transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+  }
+  .code-input::placeholder{font-family:var(--sans);font-size:13px;letter-spacing:.06em;color:var(--ink-faint)}
+  .code-input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 10px 24px -22px rgba(207,72,96,.95)}
+  .code-input.bad{border-color:var(--accent);animation:shake .42s ease}
+  @keyframes shake{
+    10%,90%{transform:translateX(-2px)}
+    30%,70%{transform:translateX(4px)}
+    50%{transform:translateX(-5px)}
+  }
+  .code-err{min-height:19px;font-size:12.5px;color:var(--accent-deep);margin:8px 0 0;letter-spacing:.02em}
+  .code-hint{font-size:12.5px;color:var(--ink-soft);margin:8px 0 0;letter-spacing:.02em}
+  .code-hint:empty{display:none}
+  .modal-actions{display:flex;gap:10px;margin-top:4px}
+  .modal-actions .btn{flex:1 1 0;min-width:0;text-align:center;padding:12px 16px}
+  .modal-note{font-size:11.5px;color:var(--ink-faint);line-height:1.6;margin:14px 0 0}
+
+  /* ---------- intro ---------- */
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;
+    font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-deep);font-weight:600;margin-bottom:22px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--accent);opacity:.6}
+
+  .intro h1{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(34px,7.2vw,56px);
+    line-height:1.2;
+    letter-spacing:-.01em;
+    margin:0 0 20px;
+  }
+  .intro h1 em{
+    font-style:normal;position:relative;
+    color:var(--accent-deep);
+    white-space:nowrap;
+  }
+  .intro h1 em::after{
+    content:"";position:absolute;left:-1px;right:-1px;bottom:.04em;height:.20em;
+    background:linear-gradient(90deg,rgba(207,72,96,.26),rgba(232,160,120,.32));
+    border-radius:2px;z-index:-1;
+  }
+  .lede{
+    font-size:16.5px;color:var(--ink-soft);
+    max-width:34em;margin:0 0 28px;line-height:1.78;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:34px}
+  .chip{
+    font-size:13px;padding:7px 14px;border-radius:100px;
+    border:1px solid var(--line);background:rgba(255,255,255,.62);
+    color:var(--ink-soft);backdrop-filter:blur(6px);
+  }
+  .chip strong{color:var(--ink);font-weight:600}
+
+  .cta{
+    display:inline-flex;align-items:center;gap:12px;
+    align-self:flex-start;
+    border:0;cursor:pointer;
+    font-family:var(--sans);font-size:16px;font-weight:600;letter-spacing:.02em;
+    color:#fff;background:linear-gradient(135deg,#d95069,#b83a51 60%,#a8344a);
+    padding:16px 30px;border-radius:100px;
+    box-shadow:0 16px 34px -16px rgba(168,52,74,.75),inset 0 1px 0 rgba(255,255,255,.28);
+    transition:transform .2s ease,box-shadow .2s ease;
+  }
+  .cta:hover{transform:translateY(-2px);box-shadow:0 22px 40px -16px rgba(168,52,74,.8),inset 0 1px 0 rgba(255,255,255,.28)}
+  .cta:active{transform:translateY(0) scale(.99)}
+  .cta span{transition:transform .2s ease}
+  .cta:hover span{transform:translateX(3px)}
+
+  .fineprint{margin-top:26px;font-size:12.5px;color:var(--ink-faint);line-height:1.7;max-width:36em}
+  .fineprint::before{content:"※ ";opacity:.7}
+
+  /* ---------- quiz ---------- */
+  .bar{
+    display:flex;align-items:baseline;justify-content:space-between;
+    font-size:12px;letter-spacing:.1em;color:var(--ink-faint);
+    text-transform:uppercase;margin-bottom:10px;
+  }
+  .bar .count{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600;letter-spacing:.06em}
+  .track{height:5px;border-radius:100px;background:rgba(37,21,26,.09);overflow:hidden;margin-bottom:clamp(28px,5vw,46px)}
+  .track > div{height:100%;width:0;border-radius:100px;background:linear-gradient(90deg,#e8808e,#cf4860);transition:width .45s cubic-bezier(.22,.8,.2,1)}
+
+  .qmeta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .qmeta .tag{
+    font-size:11.5px;letter-spacing:.14em;color:var(--accent-deep);
+    background:var(--accent-tint);padding:5px 11px;border-radius:6px;font-weight:600;
+  }
+  .qmeta .sub{font-size:12px;color:var(--ink-faint)}
+
+  .qbody{animation:swapIn .38s cubic-bezier(.22,.8,.2,1) both}
+  @keyframes swapIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .qtext{
+    font-family:var(--serif);font-weight:700;
+    font-size:clamp(20px,3.9vw,26px);line-height:1.52;
+    margin:0 0 clamp(22px,4vw,32px);
+    letter-spacing:-.005em;
+  }
+
+  .opts{display:grid;gap:10px}
+  .opt{
+    display:flex;align-items:flex-start;gap:14px;
+    width:100%;text-align:left;cursor:pointer;
+    padding:16px 20px;border-radius:14px;
+    border:1px solid var(--line);background:rgba(255,253,250,.92);
+    color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.62;
+    transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease;
+    animation:optIn .45s cubic-bezier(.22,.8,.2,1) both;
+  }
+  @keyframes optIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .opt .k{
+    flex:0 0 25px;height:25px;margin-top:2px;border-radius:50%;
+    display:grid;place-items:center;
+    background:#f4e4e5;color:#96606b;
+    font-family:var(--serif);font-size:12px;font-weight:700;letter-spacing:.04em;
+    transition:background .18s ease,color .18s ease;
+  }
+  .opt:hover{border-color:rgba(207,72,96,.34);background:#fffaf9;transform:translateY(-1px);box-shadow:0 14px 26px -22px rgba(80,26,38,.9)}
+  .opt:focus-visible{outline:2px solid rgba(207,72,96,.5);outline-offset:2px}
+  .opt.sel{
+    border-color:var(--accent);background:#fff5f6;
+    box-shadow:0 14px 28px -22px rgba(207,72,96,.9),inset 0 0 0 1px rgba(207,72,96,.16);
+  }
+  .opt.sel .k{background:var(--accent);color:#fff}
+
+  .qfoot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:22px}
+  .ghost{
+    border:0;background:transparent;color:var(--ink-faint);
+    font-family:var(--sans);font-size:13.5px;cursor:pointer;
+    padding:8px 10px;border-radius:8px;transition:color .18s ease,background .18s ease;
+  }
+  .ghost:hover{color:var(--ink);background:rgba(37,21,26,.05)}
+  .ghost[disabled]{opacity:.35;cursor:default}
+  .hint{font-size:12px;color:var(--ink-faint);letter-spacing:.03em}
+
+  /* ---------- result ---------- */
+  .res-head{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .res-kicker{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:18px}
+
+  .ring{position:relative;width:184px;height:184px;margin-bottom:6px}
+  .ring svg{width:100%;height:100%;display:block}
+  .ring .num{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  }
+  .ring .num b{
+    font-family:var(--num);font-size:44px;font-weight:600;line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  }
+  .ring .num i{font-style:normal;font-size:11.5px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase}
+
+  .ring-note{
+    font-size:12px;letter-spacing:.16em;color:var(--ink-faint);
+    font-variant-numeric:tabular-nums;margin:14px 0 0;
+  }
+  .level{
+    display:block;
+    margin:22px 0 8px;
+    font-family:var(--serif);font-size:clamp(26px,5.2vw,34px);font-weight:700;
+    letter-spacing:.04em;line-height:1.3;
+  }
+  .level-sub{font-size:13.5px;color:var(--accent-deep);letter-spacing:.12em;margin-bottom:22px}
+
+  .verdict{
+    font-size:15.5px;line-height:1.85;color:var(--ink-soft);
+    max-width:34em;margin:0 auto 30px;
+  }
+
+  .dims{display:grid;gap:16px;margin:0 0 30px;padding:22px 24px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.55)}
+  .dim-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .dim-name{font-size:14.5px;font-weight:600}
+  .dim-note{font-size:11.5px;color:var(--ink-faint);margin-left:8px;font-weight:400}
+  .dim-val{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;letter-spacing:.05em;font-family:var(--num)}
+  .dim-track{height:6px;border-radius:100px;background:rgba(37,21,26,.08);overflow:hidden}
+  .dim-track > div{height:100%;width:0;border-radius:100px;transition:width 1.1s cubic-bezier(.22,.8,.2,1) .18s}
+  .dim-track > div.hi{background:linear-gradient(90deg,#e0707f,#bd3b52)}
+  .dim-track > div.mid{background:linear-gradient(90deg,#e79aa3,#d06174)}
+  .dim-track > div.lo{background:linear-gradient(90deg,#e7c2c6,#cd99a0)}
+
+  .panel{
+    border-left:2px solid rgba(207,72,96,.35);
+    padding:2px 0 2px 20px;margin-bottom:30px;
+  }
+  .panel h3{
+    font-size:12px;letter-spacing:.18em;
+    color:var(--accent-deep);margin:0 0 14px;font-weight:600;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .advice-tag{
+    font-size:11.5px;letter-spacing:.04em;font-weight:500;
+    color:var(--ink-soft);background:rgba(37,21,26,.05);
+    padding:3px 9px;border-radius:100px;
+  }
+  .panel ol{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+  .panel ol li{display:flex;gap:12px;font-size:14.5px;line-height:1.72;color:var(--ink-soft)}
+  .panel ol li b{flex:0 0 auto;font-family:var(--num);color:var(--accent-deep);font-weight:600;font-variant-numeric:tabular-nums}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+  .btn{
+    font-family:var(--sans);font-size:14.5px;font-weight:600;cursor:pointer;
+    padding:13px 24px;border-radius:100px;border:1px solid transparent;
+    transition:transform .18s ease,box-shadow .18s ease,background .18s ease,color .18s ease;
+  }
+  .btn.primary{
+    color:#fff;background:linear-gradient(135deg,#d95069,#a8344a);
+    box-shadow:0 14px 28px -18px rgba(168,52,74,.85);
+  }
+  .btn.primary:hover{transform:translateY(-1px)}
+  .btn.line{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn.line:hover{background:#fff;border-color:rgba(207,72,96,.28);color:var(--accent-deep)}
+
+  .res-fine{font-size:12px;color:var(--ink-faint);line-height:1.75;max-width:38em}
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+    background:#25151a;color:#fff;font-size:13px;padding:11px 20px;border-radius:100px;
+    opacity:0;pointer-events:none;transition:.3s ease;z-index:9;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:520px){
+    .opt{padding:14px 15px;font-size:14.5px}
+    .ring{width:160px;height:160px}
+    .ring .num b{font-size:38px}
+    .dims{padding:18px 16px}
+    .panel{padding-left:14px}
+    .actions .btn{flex:1 1 auto;text-align:center}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<main class="shell">
+  <!-- ============ intro ============ -->
+  <section class="screen is-active intro" id="intro">
+    <div class="eyebrow">Partner Loyalty Test · 30 Questions</div>
+    <h1>你眼里的 TA<br>到底有<em>几分</em>真心</h1>
+    <p class="lede">
+      30 道情境题，全部关于 TA。按你对 TA 的了解，选出最像的那一项——
+      专一、透明、边界、投入，四个维度，看看你心里其实早就知道的那个答案。
+    </p>
+    <div class="chips">
+      <span class="chip"><strong>30</strong> 道关于 TA</span>
+      <span class="chip">约 <strong>5</strong> 分钟</span>
+      <span class="chip"><strong>4</strong> 个维度</span>
+      <span class="chip">即时生成结果</span>
+    </div>
+    <button class="cta" id="start">开始测 TA <span>→</span></button>
+    <p class="fineprint">这份结果是你对 TA 的判断，不是对 TA 的判决，也别拿它当证据。答案只保存在本机浏览器里，不会上传。仅供自我觉察，不构成任何关系结论。</p>
+  </section>
+
+  <!-- ============ quiz ============ -->
+  <section class="screen" id="quiz">
+    <div class="bar">
+      <span class="count" id="count">第 01 / 30 题</span>
+      <span id="pct">3%</span>
+    </div>
+    <div class="track"><div id="progress"></div></div>
+
+    <div class="qbody" id="qbody">
+      <div class="qmeta">
+        <span class="tag" id="dimTag">专一度</span>
+        <span class="sub" id="dimSub">心是不是只放在一个人身上</span>
+      </div>
+      <h2 class="qtext" id="qtext"></h2>
+      <div class="opts" id="opts"></div>
+    </div>
+
+    <div class="qfoot">
+      <button class="ghost" id="back" disabled>← 上一题</button>
+      <span class="hint">选择后自动进入下一题</span>
+    </div>
+  </section>
+
+  <!-- ============ result ============ -->
+  <section class="screen" id="result">
+    <div class="res-head">
+      <div class="res-kicker">你在 TA 身上看到的</div>
+      <div class="ring">
+        <svg viewBox="0 0 160 160" aria-hidden="true">
+          <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(37,21,26,.09)" stroke-width="2"/>
+          <circle id="ringArc" cx="80" cy="80" r="68" fill="none" stroke="url(#g1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="427.26" stroke-dashoffset="427.26" transform="rotate(-90 80 80)"/>
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#e8808e"/>
+              <stop offset="60%" stop-color="#cf4860"/>
+              <stop offset="100%" stop-color="#a8344a"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="num"><b id="bigScore">0</b><i>Loyalty Index</i></div>
+      </div>
+      <div class="ring-note" id="ringNote">总分 0 / 90</div>
+
+      <div class="level" id="levelName">稳固型</div>
+      <div class="level-sub" id="levelSub"></div>
+    </div>
+
+    <p class="verdict" id="verdict"></p>
+
+    <div class="dims" id="dims"></div>
+
+    <div class="panel">
+      <h3>可以立刻做的加固<span class="advice-tag" id="adviceTag"></span></h3>
+      <ol id="advice"></ol>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="again">再测一次</button>
+      <button class="btn line" id="copy">复制结果文案</button>
+    </div>
+    <p class="res-fine">分数只是你对 TA 的印象，不是事实。真正决定关系走向的，是你们愿不愿意坐下来把这几件事聊开。</p>
+  </section>
+</main>
+
+<div class="modal" id="codeModal" aria-hidden="true">
+  <div class="modal-mask" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
+    <div class="modal-eyebrow">Private Access</div>
+    <h2 class="modal-title" id="codeTitle">先输入验证码</h2>
+    <p class="modal-desc">这个测试只对拿到验证码的人开放，验证码可以问发链接给你的人要。</p>
+    <form id="codeForm" autocomplete="off">
+      <input class="code-input" id="codeInput" type="text" maxlength="12" placeholder="输入验证码" aria-label="验证码" />
+      <p class="code-hint" id="codeHint"></p>
+      <p class="code-err" id="codeErr" role="alert"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn line" data-close>取消</button>
+        <button type="submit" class="btn primary">进入测试</button>
+      </div>
+    </form>
+    <p class="modal-note">验证码写在网页里，只是分享门槛，别当密码用。</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">已复制到剪贴板</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DIMS = {
+    exclusive:   { name:"专一度", sub:"TA 的心是不是只放在你身上", tips:[
+      "别靠猜：把你真正在意的那件小事说出来。「上周那个电话我有点在意」比「你是不是有事瞒我」有效得多。",
+      "把安全感做成双向的：你先自然地在别人面前提到 TA，TA 也更容易这样对你。"
+    ]},
+    transparent: { name:"透明度", sub:"TA 有没有藏着不说的事", tips:[
+      "用交换代替审问：先讲一件你今天没说出口的事，再问 TA 最近有没有什么憋着。",
+      "少问「你为什么不告诉我」，多问「是什么让你觉得不能说」——后者才有答案。"
+    ]},
+    boundary:    { name:"边界感", sub:"TA 和别人保持着多远的距离", tips:[
+      "把尺度放桌面上谈：不是查岗，而是一起定一条两个人都舒服的线。",
+      "先分清「正常来往」和「让你不舒服的那一下」，只谈后者，别把对方逼成辩护。"
+    ]},
+    devotion:    { name:"投入度", sub:"TA 愿意为你花多少力气", tips:[
+      "把期待说具体：与其说「你都不陪我」，不如说「周六晚上我们留出来」。",
+      "别用测试代替沟通：一份问卷问不出真相，一次认真的对话可以。"
+    ]}
+  };
+
+  var Q = [
+    /* ---------- 专一度 1-8 ---------- */
+    { d:"exclusive", q:"前任给 TA 发来一句「最近还好吗」，TA 会怎么处理？", o:[
+      ["直接告诉你，一起商量怎么回",3],
+      ["简单回一句「挺好的」，就此打住",2],
+      ["聊几句近况，觉得没必要跟你提",1],
+      ["瞒着你聊下去，反正也不是什么大事",0]
+    ]},
+    { d:"exclusive", q:"有人明显对 TA 有好感，主动加了 TA 的微信。", o:[
+      ["会拒绝，或者第一时间告诉你",3],
+      ["会通过，但只当普通联系人，不私聊",2],
+      ["会偶尔翻翻对方动态，不打算做什么",1],
+      ["会主动找话题聊，享受那种心跳",0]
+    ]},
+    { d:"exclusive", q:"TA 一个人出差整整一周，你觉得 TA 的状态更像哪一种？", o:[
+      ["忙完就找你，行程都会说",3],
+      ["会报备，但晚上应酬后不太回消息",2],
+      ["该玩玩该忙忙，回来才讲细节",1],
+      ["像回到了单身，几乎不联系你",0]
+    ]},
+    { d:"exclusive", q:"有人当着 TA 的面说「你比你家那位有意思多了」。", o:[
+      ["TA 会当场挡回去，说你才是最好的",3],
+      ["礼貌笑一下，不再接这个话题",2],
+      ["心里受用，会跟对方多说几句",1],
+      ["顺势暧昧一下，觉得只是玩笑",0]
+    ]},
+    { d:"exclusive", q:"TA 手机里还留着前任的照片和聊天记录吗？", o:[
+      ["早就删干净了，也说过不喜欢留这些",3],
+      ["删了大部分，只留了一点点回忆",2],
+      ["都留着，但从来不会去翻",1],
+      ["留着，偶尔还会翻一翻",0]
+    ]},
+    { d:"exclusive", q:"TA 的社交主页上，有你们的合照吗？", o:[
+      ["有，而且很自然，不介意谁看见",3],
+      ["有，但只对一部分人可见",2],
+      ["很少发，觉得没必要公开",1],
+      ["没有，主页看起来像单身",0]
+    ]},
+    { d:"exclusive", q:"如果有一个「绝对不会被发现」的约会机会摆在 TA 面前。", o:[
+      ["TA 会直接拒绝，连考虑都不用",3],
+      ["会心动一下，但会自己打住",2],
+      ["会犹豫很久，可能一直想着",1],
+      ["会去，反正也没人知道",0]
+    ]},
+    { d:"exclusive", q:"你问 TA「最近有没有对别人动过心」，TA 的第一反应是？", o:[
+      ["坦白说偶尔会，但更确定爱的是你",3],
+      ["说没有，然后把话题轻轻带过去",2],
+      ["有点心虚，回答得含糊",1],
+      ["反问「你是不是有事」，把矛头转回来",0]
+    ]},
+
+    /* ---------- 透明度 9-15 ---------- */
+    { d:"transparent", q:"你说想看看 TA 的手机。", o:[
+      ["直接递给你，没什么不能看的",3],
+      ["会先问一句「怎么了」，然后给你看",2],
+      ["觉得被冒犯，犹豫之后还是给了",1],
+      ["拒绝，说这是隐私，让你别多想",0]
+    ]},
+    { d:"transparent", q:"TA 今晚和一群朋友出去，其中有异性，会怎么跟你说？", o:[
+      ["提前说清楚有谁，中途也会回你消息",3],
+      ["提一句「和朋友吃饭」，细节不多讲",2],
+      ["只说「有事出门」，其他不提",1],
+      ["先不说，回来再讲",0]
+    ]},
+    { d:"transparent", q:"TA 换了新工作、到了新环境，第一个知道的人通常是？", o:[
+      ["你，几乎实时同步",3],
+      ["你，但会等事情定下来才说",2],
+      ["先跟朋友聊，你之后才知道",1],
+      ["谁都不说，自己消化",0]
+    ]},
+    { d:"transparent", q:"TA 有一笔钱花在了不太好解释的地方。", o:[
+      ["会主动说清楚来龙去脉",3],
+      ["会讲个大概，细节省略",2],
+      ["能不提就不提",1],
+      ["会想办法把它瞒下来",0]
+    ]},
+    { d:"transparent", q:"你问 TA「今天过得怎么样」，TA 通常怎么回答？", o:[
+      ["会讲具体的事，包括那些不顺心的",3],
+      ["挑几件重要的说",2],
+      ["「还行」「就那样」",1],
+      ["敷衍两句，不太想跟你聊",0]
+    ]},
+    { d:"transparent", q:"TA 心里堵得慌的时候，最先找谁？", o:[
+      ["你，讲完才觉得轻松",3],
+      ["你，但怕你担心，只讲一部分",2],
+      ["更愿意跟朋友讲，你最后才知道",1],
+      ["谁也不讲，自己扛着",0]
+    ]},
+    { d:"transparent", q:"你靠近去看 TA 的屏幕时，TA 的下意识动作是？", o:[
+      ["没什么反应，本来也不设防",3],
+      ["继续做自己的事，不刻意回避",2],
+      ["会顺手把屏幕侧过去一点",1],
+      ["会立刻锁屏或者切走",0]
+    ]},
+
+    /* ---------- 边界感 16-23 ---------- */
+    { d:"boundary", q:"一个异性朋友凌晨两点给 TA 发「我很难受，能聊聊吗」。", o:[
+      ["会让对方明天再说，或建议找更合适的人",3],
+      ["简短安慰几句，然后结束对话",2],
+      ["会陪对方聊到情绪好起来",1],
+      ["会陪一整夜，还没告诉你",0]
+    ]},
+    { d:"boundary", q:"聚会上有人一直给 TA 倒酒、找话题。", o:[
+      ["会明确拉开距离，早点离开",3],
+      ["礼貌应付，不制造单独相处的机会",2],
+      ["觉得挺有意思，多聊一会儿",1],
+      ["会留联系方式，之后继续聊",0]
+    ]},
+    { d:"boundary", q:"异性同事跟 TA 说「顺路，我送你回去吧」。", o:[
+      ["会婉拒，或者叫上其他人一起走",3],
+      ["会坐，但全程公事公办",2],
+      ["会坐，路上聊得挺投缘",1],
+      ["会坐，心里还有点期待下一次",0]
+    ]},
+    { d:"boundary", q:"TA 的异性好友在别人面前说「这是我最好的朋友」，你知道这个人吗？", o:[
+      ["知道，也见过，关系很清楚",3],
+      ["知道有这么个人，但没见过",2],
+      ["听过名字，不太清楚是什么关系",1],
+      ["完全不知道",0]
+    ]},
+    { d:"boundary", q:"社交软件上有人给 TA 发很暧昧的表情包。", o:[
+      ["不回，或者直接删掉对话",3],
+      ["回个正经表情，结束聊天",2],
+      ["回一个更暧昧的，觉得好玩",1],
+      ["顺着往下聊，看会到哪一步",0]
+    ]},
+    { d:"boundary", q:"TA 和你吵完架，会去找异性朋友倾诉吗？", o:[
+      ["不会，会先跟你把话说开",3],
+      ["会找同性朋友，或者自己先冷静",2],
+      ["会找异性朋友，觉得对方更懂自己",1],
+      ["会找那个「一直很关心我」的人",0]
+    ]},
+    { d:"boundary", q:"你不在的场合，有人问 TA「你单身吗」？", o:[
+      ["立刻说有伴侣，还会顺口提两句你",3],
+      ["说「有」，不多解释",2],
+      ["含糊笑笑，不正面回答",1],
+      ["顺着说「算是吧」",0]
+    ]},
+    { d:"boundary", q:"TA 的前任要结婚了，邀请 TA 去，TA 会？", o:[
+      ["不去，也不打算单独见面",3],
+      ["会去，但会带上你或者朋友",2],
+      ["会去，当作一次体面的告别",1],
+      ["会去，还想单独见一面",0]
+    ]},
+
+    /* ---------- 投入度 24-30 ---------- */
+    { d:"devotion", q:"你们已经三个月没有好好约会了。", o:[
+      ["TA 会主动安排，哪怕只是散个步",3],
+      ["会提出来，然后等你定时间",2],
+      ["会抱怨几句，但不太行动",1],
+      ["觉得也没什么，各忙各的挺好",0]
+    ]},
+    { d:"devotion", q:"你生病了，TA 手上正压着一个重要项目。", o:[
+      ["会想办法抽时间陪你，或把照顾安排好",3],
+      ["下班赶过来，路上一直保持联系",2],
+      ["让你先自己处理，忙完再说",1],
+      ["心里想「又不是什么大病」",0]
+    ]},
+    { d:"devotion", q:"关于未来——住哪、钱怎么花、要不要孩子，TA 聊过吗？", o:[
+      ["聊得很具体，有过认真规划",3],
+      ["聊过大概方向，细节还没定",2],
+      ["一提就回避，说「以后再说」",1],
+      ["从没聊过，也不敢聊",0]
+    ]},
+    { d:"devotion", q:"你兴致勃勃讲一个 TA 完全不感兴趣的话题。", o:[
+      ["会认真听，还会追问几句",3],
+      ["听一会儿，适时给你回应",2],
+      ["「嗯嗯」两声，然后刷手机",1],
+      ["直接说「这个真没意思」",0]
+    ]},
+    { d:"devotion", q:"你们吵架的时候，TA 的典型反应是？", o:[
+      ["会停下来听，想办法把问题解决",3],
+      ["会吵，但不会说伤人的话",2],
+      ["冷战，等你先低头",1],
+      ["消失几天，或者找别人安慰自己",0]
+    ]},
+    { d:"devotion", q:"你的小习惯（挤牙膏方式、睡觉打呼），TA 的态度是？", o:[
+      ["觉得有点可爱，也能接受",3],
+      ["会吐槽，但不真的介意",2],
+      ["会烦，经常忍不住说两句",1],
+      ["忍不了，会想「是不是选错了」",0]
+    ]},
+    { d:"devotion", q:"如果现在要 TA 说「我们会一直在一起」。", o:[
+      ["很笃定，也一直在为此努力",3],
+      ["希望如此，也愿意试一试",2],
+      ["说不准，看情况吧",1],
+      ["其实心里还有别的打算",0]
+    ]}
+  ];
+
+  /* ============================================================
+     暗号设置：改下面这一行即可。
+     想换暗号 → 把 "1314" 换成你想要的内容，保存/重新提交即可。
+     留空（写成 ""）→ 不校验暗号，任何人打开都直接进入测试。
+     注意：暗号写在网页源码里，只是"门槛"，不是真正的密码。
+     ============================================================ */
+  var ACCESS_CODE = "1314";
+  var ACCESS_HINT = "";   // 可选的提示文案，例如 "提示：我们第一次见面的日子"
+
+  var LETTERS = ["A","B","C","D"];
+  var state = { i:0, answers:new Array(Q.length).fill(null), locked:false, orders:[] };
+
+  /* deterministic shuffle so options don't always put the "best" answer in the same slot */
+  function orderFor(idx, n){
+    var a = [], i, j, t;
+    for(i=0;i<n;i++) a.push(i);
+    var s = (idx+3)*7919 + 104729;
+    function rnd(){ s = (s*9301 + 49297) % 233280; return s/233280; }
+    for(i=n-1;i>0;i--){ j = Math.floor(rnd()*(i+1)); t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a;
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var screens = { intro:$("intro"), quiz:$("quiz"), result:$("result") };
+
+  function show(name){
+    Object.keys(screens).forEach(function(k){
+      screens[k].classList.toggle("is-active", k === name);
+    });
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function renderQuestion(){
+    var q = Q[state.i];
+    var dim = DIMS[q.d];
+    if(!state.orders[state.i]) state.orders[state.i] = orderFor(state.i, q.o.length);
+
+    $("count").textContent = "第 " + pad(state.i+1) + " / " + Q.length + " 题";
+    $("pct").textContent = Math.round(((state.i)/Q.length)*100) + "%";
+    $("progress").style.width = ((state.i)/Q.length*100) + "%";
+    $("dimTag").textContent = dim.name;
+    $("dimSub").textContent = dim.sub;
+    $("qtext").textContent = q.q;
+
+    var html = "";
+    state.orders[state.i].forEach(function(oi, k){
+      var o = q.o[oi];
+      var sel = state.answers[state.i] === oi ? " sel" : "";
+      html += '<button class="opt' + sel + '" data-oi="' + oi + '" style="animation-delay:' + (k*45) + 'ms">' +
+                '<span class="k">' + LETTERS[k] + '</span>' +
+                '<span class="t">' + o[0] + '</span>' +
+              '</button>';
+    });
+    $("opts").innerHTML = html;
+    $("back").disabled = state.i === 0;
+
+    Array.prototype.forEach.call($("opts").querySelectorAll(".opt"), function(btn){
+      btn.addEventListener("click", onPick);
+    });
+
+    var body = $("qbody");
+    body.style.animation = "none";
+    void body.offsetWidth;
+    body.style.animation = "";
+  }
+
+  function pad(n){ return n < 10 ? "0" + n : "" + n; }
+
+  function onPick(e){
+    if(state.locked) return;
+    var btn = e.currentTarget;
+    var oi = Number(btn.getAttribute("data-oi"));
+    state.answers[state.i] = oi;
+
+    Array.prototype.forEach.call($("opts").querySelectorAll(".opt"), function(b){
+      b.classList.toggle("sel", b === btn);
+    });
+
+    state.locked = true;
+    setTimeout(function(){
+      state.locked = false;
+      if(state.i < Q.length - 1){
+        state.i++;
+        renderQuestion();
+      } else {
+        finish();
+      }
+    }, 280);
+  }
+
+  function finish(){
+    show("result");
+    var per = {}, total = 0, max = 0, counts = {};
+
+    Object.keys(DIMS).forEach(function(k){ per[k] = 0; counts[k] = 0; });
+
+    Q.forEach(function(q, idx){
+      var oi = state.answers[idx];
+      var score = (oi === null) ? 0 : q.o[oi][1];
+      per[q.d] += score;
+      total += score;
+      counts[q.d] += 3;
+      max += 3;
+    });
+
+    var pct = max ? total / max : 0;
+    var level = pickLevel(pct);
+
+    $("bigScore").textContent = Math.round(pct*100) + "%";
+    $("ringNote").textContent = "总分 " + total + " / " + max;
+
+    /* dimension bars */
+    var dimHTML = "";
+    Object.keys(DIMS).forEach(function(k){
+      var p = per[k] / counts[k];
+      var tone = p >= .82 ? "hi" : (p >= .55 ? "mid" : "lo");
+      dimHTML += '<div class="dim">' +
+        '<div class="dim-top">' +
+          '<div><span class="dim-name">' + DIMS[k].name + '</span>' +
+          '<span class="dim-note">' + DIMS[k].sub + '</span></div>' +
+          '<span class="dim-val">' + Math.round(p*100) + '% · ' + labelOf(p) + '</span>' +
+        '</div>' +
+        '<div class="dim-track"><div class="' + tone + '" data-w="' + (p*100) + '"></div></div>' +
+      '</div>';
+    });
+    $("dims").innerHTML = dimHTML;
+
+    /* verdict + level */
+    $("levelName").textContent = level.name;
+    $("levelSub").textContent = level.sub;
+    $("verdict").textContent = level.text;
+
+    /* advice from the two weakest dimensions */
+    var rank = Object.keys(DIMS).map(function(k){
+      return { k:k, p: per[k] / counts[k] };
+    }).sort(function(a,b){ return a.p - b.p; });
+
+    var weakPct = per[rank[0].k] / counts[rank[0].k];
+    var adviceHTML = "";
+    var tips = [], adviceTag = "";
+
+    if(weakPct >= .82){
+      adviceTag = "守住这份稳";
+      tips = [
+        "别把笃定当成默认设置：你看到的稳，也需要被说出来，每周讲一次具体的欣赏。",
+        "一起做没做过的小事：新的体验比重复的日常更能给关系保温。"
+      ];
+    } else {
+      adviceTag = "最该聊开的是「" + DIMS[rank[0].k].name + "」";
+      tips = DIMS[rank[0].k].tips.slice(0, 2);
+      if(per[rank[1].k] / counts[rank[1].k] < .66) tips.push(DIMS[rank[1].k].tips[0]);
+    }
+
+    tips.forEach(function(tip, i){
+      adviceHTML += '<li><b>' + (i+1) + '.</b><span>' + tip + '</span></li>';
+    });
+    $("advice").innerHTML = adviceHTML;
+    $("adviceTag").textContent = adviceTag;
+
+    state.results = {
+      pct: Math.round(pct*100),
+      total: total,
+      level: level,
+      weakest: DIMS[rank[0].k].name,
+      per: per,
+      counts: counts
+    };
+
+    /* animate ring + bars after layout */
+    var R = 427.26;
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        $("ringArc").style.transition = "stroke-dashoffset 1.3s cubic-bezier(.22,.8,.2,1)";
+        $("ringArc").style.strokeDashoffset = String(R * (1 - pct));
+        Array.prototype.forEach.call(document.querySelectorAll(".dim-track > div"), function(d){
+          d.style.width = d.getAttribute("data-w") + "%";
+        });
+      });
+    });
+  }
+
+  function labelOf(p){
+    if(p >= .82) return "很高";
+    if(p >= .66) return "较高";
+    if(p >= .48) return "中等";
+    if(p >= .30) return "偏低";
+    return "很低";
+  }
+
+  function pickLevel(p){
+    if(p >= .86) return {
+      name:"铁壁型", sub:"你几乎不需要猜 TA",
+      text:"在你眼里，TA 几乎没有「留一手」的痕迹：手机不设防、行程会主动说、和别人的距离也拎得清。你给出的高分，其实是你对这段关系的信心——记得把它说出来，TA 未必知道自己被这样看见。"
+    };
+    if(p >= .70) return {
+      name:"稳固型", sub:"大体上，你是放心的",
+      text:"你对 TA 的判断是稳的：大方向清晰，也有几处让你偶尔「嗯？」一下的细节，但还没到要翻旧账的程度。这大概就是可以安心过日子的那种稳——别让那几处细节一直堆着。"
+    };
+    if(p >= .55) return {
+      name:"摇摆型", sub:"信，但有些地方在晃",
+      text:"你是愿意相信 TA 的，只是有几题一选就犹豫。不是 TA 一定做了什么，而是你们之间还缺几次摊开来的对话，让那些猜测有地方落下来。"
+    };
+    if(p >= .40) return {
+      name:"松动型", sub:"你心里已经有一点数了",
+      text:"答案里出现了不少「算了，我也说不清」。你其实已经察觉到一些不对劲，只是还没决定要不要认真面对。这种时候，直觉通常比证据更早知道答案。"
+    };
+    return {
+      name:"高危型", sub:"该坐下来好好聊一次了",
+      text:"很多题你选的都不是最让你放心的那一项。这不一定说明 TA 有问题，但至少说明：你现在很难对这段关系说出「确定」两个字。这份不舒服值得被认真对待，而不是继续压下去。"
+    };
+  }
+
+  function reset(){
+    state.i = 0;
+    state.answers = new Array(Q.length).fill(null);
+    state.orders = [];
+    state.locked = false;
+    state.results = null;
+    show("quiz");
+    renderQuestion();
+  }
+
+  function toast(msg){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("on");
+    clearTimeout(t._t);
+    t._t = setTimeout(function(){ t.classList.remove("on"); }, 1900);
+  }
+
+  function copyResult(){
+    if(!state.results) return;
+    var r = state.results;
+    var txt = "TA 的忠诚度测试 · " + r.pct + "%（" + r.total + "/90）\n" +
+              r.level.name + "｜" + r.level.sub + "\n" +
+              "最需要加固：" + r.weakest + "\n" +
+              r.level.text;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ toast("已复制到剪贴板"); },
+        function(){ fallbackCopy(txt); });
+    } else {
+      fallbackCopy(txt);
+    }
+  }
+
+  function fallbackCopy(txt){
+    var ta = document.createElement("textarea");
+    ta.value = txt;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand("copy"); toast("已复制到剪贴板"); }
+    catch(e){ toast("复制失败，请手动选择文本"); }
+    document.body.removeChild(ta);
+  }
+
+  /* keyboard: 1-4 to answer, arrows to move */
+  document.addEventListener("keydown", function(e){
+    if(!screens.quiz.classList.contains("is-active")) return;
+    if(e.key >= "1" && e.key <= "4"){
+      var k = Number(e.key) - 1;
+      var btns = $("opts").querySelectorAll(".opt");
+      if(btns[k]) btns[k].click();
+    }
+    if(e.key === "ArrowLeft" && state.i > 0){ state.i--; renderQuestion(); }
+  });
+
+  /* ---------- 验证码弹窗 ---------- */
+  var modal = $("codeModal");
+
+  function openCode(){
+    modal.classList.add("on");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    $("codeInput").value = "";
+    $("codeInput").classList.remove("bad");
+    $("codeErr").textContent = "";
+    $("codeHint").textContent = ACCESS_HINT || "";
+    setTimeout(function(){ try{ $("codeInput").focus(); }catch(e){} }, 260);
+  }
+
+  function closeCode(){
+    modal.classList.remove("on");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    try{ $("start").focus(); }catch(e){}
+  }
+
+  function submitCode(e){
+    if(e && e.preventDefault) e.preventDefault();
+    var input = $("codeInput");
+    var value = (input.value || "").trim();
+    if(value.toLowerCase() === String(ACCESS_CODE).toLowerCase()){
+      closeCode();
+      reset();
+    } else {
+      input.classList.remove("bad");
+      void input.offsetWidth;
+      input.classList.add("bad");
+      $("codeErr").textContent = "验证码不对，再想想。";
+      input.select();
+    }
+  }
+
+  $("codeForm").addEventListener("submit", submitCode);
+  modal.addEventListener("click", function(e){
+    if(e.target && e.target.hasAttribute("data-close")) closeCode();
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && modal.classList.contains("on")) closeCode();
+  });
+
+  $("start").addEventListener("click", function(){
+    if(!ACCESS_CODE){ reset(); return; }
+    openCode();
+  });
+  $("back").addEventListener("click", function(){
+    if(state.i > 0){ state.i--; renderQuestion(); }
+  });
+  $("again").addEventListener("click", reset);
+  $("copy").addEventListener("click", copyResult);
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
